@@ -13,10 +13,20 @@ export const start = async () => {
   const rootSchema = `
     type Cat {
       name: String
+      age: Int!
+    }
+
+    input CatInput {
+      name: String
+      age: Int!
     }
 
     type Gsus {
       name: String
+    }
+
+    type Mutation {
+      newCat(input: CatInput!): Cat!
     }
 
     type Query {
