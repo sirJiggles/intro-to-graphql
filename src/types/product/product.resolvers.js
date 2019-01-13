@@ -11,8 +11,8 @@ const productsTypeMatcher = {
 
 export default {
   Product: {
-    id(_, value) {
-      return '_id'
+    createdBy(product) {
+      return product.creat
     }
   },
   Query: {
