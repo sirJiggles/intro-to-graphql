@@ -10,7 +10,15 @@ const productsTypeMatcher = {
 }
 
 export default {
-  Query: {},
+  Query: {
+    // info is AST
+    // context is context of the app
+    // args are args it was called with
+    // _ we are not using right now but will look at shortly
+    getData(_, args, context, info) {
+      return Product.findById(args.id)
+    }
+  },
   Mutation: {},
   Product: {
     __resolveType(product) {}
