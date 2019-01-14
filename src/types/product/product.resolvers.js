@@ -11,62 +11,58 @@ const productsTypeMatcher = {
 
 export default {
   Product: {
-    createdBy(product) {
-      return product.creat
+    __resolveType(product) {},
+    async createdBy(product, args) {
+      try {
+        const user = await User.findById(product.createdBy)
+        return user._id
+      } catch (error) {
+        throw new Error(error)
+      }
     }
   },
   Query: {
-    products() {
-      return Product.find({}).exec()
+    async products() {
+      try {
+        return await Product.find({})
+      } catch (error) {
+        throw new Error(error)
+      }
     },
-    product(_, args) {
-      return Product.find({ _id: args.id }).exec()
+    async product(_, args) {
+      try {
+        return await Product.findById(args.id)
+      } catch (error) {
+        throw new Error(error)
+      }
     }
   },
   Mutation: {
-    newProduct(_, args) {
-      Product.create(args.input, (err, product) => {
-        if (err) {
-          throw err
-        }
-        if (!product) {
-          throw new Error('could not make the new product')
-        }
-        return product
-      })
-    },
-    removeProduct(_, args) {
-      Product.findById(args.id, (err, product) => {
-        if (err) {
-          throw err
-        }
-        if (!product) {
-          throw new Error('could not find product to remove')
-        }
-        return product.remove()
-      })
-    },
-    updateProduct(_, args) {
-      Product.findById(args.id, (err, product) => {
-        if (err) {
-          throw err
-        }
-        if (!product) {
-          throw new Error('could not find prod to update the product')
-        }
-        product.update(args, (err, updatedProduct) => {
-          if (err) {
-            throw err
-          }
-          if (!updatedProduct) {
-            throw new Error('could not update the product')
-          }
-          return updatedProduct
+    async newProduct(_, args, ctx) {
+      try {
+        return await Product.create({
+          ...args.input,
+          createdBy: ctx.user._id
         })
-      })
+      } catch (error) {
+        throw new Error(error)
+      }
+    },
+    async removeProduct(_, args) {
+      try {
+        const product = await Product.findById(args.id)
+        return await product.remove()
+      } catch (error) {
+        throw new Error(error)
+      }
+    },
+    async updateProduct(_, args) {
+      try {
+        await Product.findOneAndUpdate({ _id: args.id }, { $set: args.input })
+        return await Product.findById(args.id)
+      } catch (error) {
+        throw new Error(error)
+      }
     }
-  },
-  Product: {
-    __resolveType(product) {}
   }
 }
